@@ -1,0 +1,5 @@
+# Health Verification Script
+kubectl get pods -o wide
+kubectl get svc
+kubectl logs -l app=backend --tail=50
+kubectl get events --sort-by='.lastTimestamp'

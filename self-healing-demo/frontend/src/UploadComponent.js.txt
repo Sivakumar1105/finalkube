@@ -1,0 +1,45 @@
+import React, { useState } from 'react';
+
+export default function UploadComponent() {
+  const [file, setFile] = useState(null);
+  const [status, setStatus] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!file) {
+      setStatus('Please select a file first');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      setStatus('Uploading...');
+      const response = await fetch('http://backend-service/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      const result = await response.text();
+      setStatus(response.ok ? result : `Error: ${result}`);
+    } catch (error) {
+      setStatus('Upload failed: ' + error.message);
+    }
+  };
+
+  return (
+    <div className="upload-section">
+      <h2>Video Upload</h2>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="file"
+          accept="video/*"
+          onChange={(e) => setFile(e.target.files[0])}
+        />
+        <button type="submit">Upload Video</button>
+      </form>
+      {status && <div className="status">{status}</div>}
+    </div>
+  );
+}

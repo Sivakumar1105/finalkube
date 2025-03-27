@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend  # Matches Service selector
+    spec:
+      containers:
+        - name: frontend-container
+          image: your-frontend-image:tag  # Replace with your image
+          ports:
+            - containerPort: 80  # Matches Service's targetPort
+          # Add volume mounts if needed (e.g., for static files)
+          volumeMounts:
+            - mountPath: "/app/static"
+              name: frontend-storage
+      volumes:
+        - name: frontend-storage
+          persistentVolumeClaim:
+            claimName: frontend-pvc  # Define this PVC in pvc.yaml

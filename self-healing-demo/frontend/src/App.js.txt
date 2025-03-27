@@ -1,0 +1,69 @@
+import React, { useState, useEffect } from 'react';
+import './App.css';
+
+function App() {
+  const [healthStatus, setHealthStatus] = useState('Checking...');
+  const [pods, setPods] = useState([]);
+
+  const checkHealth = async () => {
+    try {
+      const response = await fetch('http://backend-service/api/health');
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      setHealthStatus(await response.text());
+    } catch (error) {
+      setHealthStatus('API Error: ' + error.message);
+    }
+  };
+
+  const fetchPods = async () => {
+    try {
+      const response = await fetch('http://backend-service/api/pod-info');
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const podName = await response.text();
+      setPods(prev => [...new Set([...prev, podName])];
+    } catch (error) {
+      console.error('Pod fetch failed:', error);
+    }
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      checkHealth();
+      fetchPods();
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="App">
+      <h1>Kubernetes Self-Healing Dashboard</h1>
+      <div className="status-container">
+        <div className="health-status">
+          <h2>API Health: {healthStatus}</h2>
+          <button 
+            onClick={async () => {
+              try {
+                await fetch('http://backend-service/api/toggle-health', { method: 'POST' });
+                checkHealth();
+              } catch (error) {
+                console.error('Toggle failed:', error);
+              }
+            }}
+          >
+            Toggle Health State
+          </button>
+        </div>
+        <div className="pod-grid">
+          {pods.map((pod, index) => (
+            <div key={index} className="pod-card">
+              <h3>{pod}</h3>
+              <p>Status: Running</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default App;

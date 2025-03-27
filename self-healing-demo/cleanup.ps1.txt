@@ -1,0 +1,4 @@
+# Self-Healing Kubernetes Cleanup Script
+minikube delete
+docker system prune -a -f
+Remove-Item -Path "$HOME\self-healing-k8s" -Recurse -Force -ErrorAction SilentlyContinue

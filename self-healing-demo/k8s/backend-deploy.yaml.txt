@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+spec:
+  replicas: 2  # Number of pod replicas
+  selector:
+    matchLabels:
+      app: backend  # Matches the Service selector
+  template:
+    metadata:
+      labels:
+        app: backend  # Label for pods (must match Service selector)
+    spec:
+      containers:
+        - name: backend-container
+          image: your-backend-image:tag  # Replace with your actual image
+          ports:
+            - containerPort: 8080  # Matches Service's targetPort
+          volumeMounts:
+            - mountPath: "/data/uploads"  # Path in the container
+              name: video-storage         # Volume name
+      volumes:
+        - name: video-storage  # Volume name (matches volumeMounts)
+          persistentVolumeClaim:
+            claimName: video-pvc  # PVC name (must exist in your cluster)

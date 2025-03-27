@@ -1,0 +1,6 @@
+# Spring Boot Configuration
+server.port=8080
+management.endpoint.health.enabled=true
+management.endpoints.web.exposure.include=health,info
+spring.servlet.multipart.max-file-size=100MB
+spring.servlet.multipart.max-request-size=100MB

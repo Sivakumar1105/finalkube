@@ -1,0 +1,11 @@
+# Load Testing Script
+$url = minikube service frontend-service --url
+1..100 | ForEach-Object {
+    try {
+        $response = Invoke-WebRequest -Uri "$url/api/health" -ErrorAction Stop
+        Write-Host "Request $_: $($response.StatusCode)"
+    } catch {
+        Write-Host "Request $_: Failed - $($_.Exception.Message)"
+    }
+    Start-Sleep -Milliseconds 200
+}

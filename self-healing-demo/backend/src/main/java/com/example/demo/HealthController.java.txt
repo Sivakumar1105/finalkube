@@ -1,0 +1,36 @@
+package com.example.demo;
+
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import java.nio.file.*;
+
+@RestController
+@RequestMapping("/api")
+public class HealthController {
+    // ... existing health endpoints ...
+
+    @PostMapping("/upload")
+    public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file) {
+        try {
+            // Validate file
+            if (file.isEmpty()) return ResponseEntity.badRequest().body("No file selected");
+            if (!file.getContentType().startsWith("video/")) {
+                return ResponseEntity.status(415).body("Only video files allowed");
+            }
+
+            // Create upload directory
+            Path uploadPath = Paths.get("/data/uploads");
+            if (!Files.exists(uploadPath)) Files.createDirectories(uploadPath);
+
+            // Save file
+            Files.copy(file.getInputStream(), 
+                     uploadPath.resolve(file.getOriginalFilename()),
+                     StandardCopyOption.REPLACE_EXISTING);
+
+            return ResponseEntity.ok("Uploaded: " + file.getOriginalFilename());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
+    }
+}
